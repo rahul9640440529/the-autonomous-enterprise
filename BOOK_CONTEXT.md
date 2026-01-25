@@ -2,7 +2,7 @@
 
 ## Authoritative source
 
-The PDF titled *The Autonomous Enterprise* located on Zenodo [The Autonomous Enterprise (PDF)](https://zenodo.org/record/1234567/files/The%20Autonomous%20Enterprise.pdf) is the single authoritative source of truth for this repository. All schemas, patterns, and documentation artifacts exist solely to support, extend, and reinforce the ideas presented in that book. When any discrepancy arises between repository artifacts and the book, the book governs.
+The PDF titled *The Autonomous Enterprise* located on Zenodo [The Autonomous Enterprise (PDF)](https://zenodo.org/records/18369118) is the single authoritative source of truth for this repository. All schemas, patterns, and documentation artifacts exist solely to support, extend, and reinforce the ideas presented in that book. When any discrepancy arises between repository artifacts and the book, the book governs.
 
 ## Intent
 
