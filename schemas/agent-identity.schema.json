@@ -1,0 +1,227 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://autonomous-enterprise/schemas/agent-identity.schema.json",
+  "title": "Agent Identity",
+  "description": "Defines agent identity as a security and governance boundary in enterprise autonomous systems. This schema supports Chapter 5 of 'The Autonomous Enterprise'. Agent identity establishes that agents are first-class actors with declared purpose, scoped authority, and organizational accountability. Identity is the foundation for trust, access control, and audit. This is a governance artifact, not an authentication specification.",
+
+  "type": "object",
+  "required": [
+    "identityVersion",
+    "agentIdentifier",
+    "ownership",
+    "purpose",
+    "authorityScope",
+    "trustClassification",
+    "lifecycleState"
+  ],
+
+  "properties": {
+
+    "identityVersion": {
+      "type": "string",
+      "description": "The version of this identity record. Versioning enables tracking of changes to an agent's declared purpose, scope, or trust level over time. Identity versions are distinct from agent implementation versions."
+    },
+
+    "agentIdentifier": {
+      "type": "object",
+      "description": "A stable, unique identifier for this agent. The identifier persists across deployments, updates, and configuration changes. It is the reference used in audit records, policy definitions, and access grants.",
+      "required": ["id", "name"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "A globally unique, immutable identifier for this agent. This identifier does not change for the lifetime of the agent identity. It is used for traceability across systems and time."
+        },
+        "name": {
+          "type": "string",
+          "description": "A human-readable name for this agent. The name may change over time, but the underlying identifier remains stable. Names support operational clarity; identifiers support technical traceability."
+        },
+        "aliases": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Alternative names or identifiers by which this agent may be known. Aliases support integration with systems that use different naming conventions while maintaining a single authoritative identity."
+        }
+      }
+    },
+
+    "ownership": {
+      "type": "object",
+      "description": "The organizational entity accountable for this agent. Ownership establishes who is responsible for the agent's behavior, configuration, and compliance. When questions arise about an agent's actions, ownership determines who must answer.",
+      "required": ["owner", "domain"],
+      "properties": {
+        "owner": {
+          "type": "string",
+          "description": "The individual, team, or organizational unit that owns this agent. Ownership implies responsibility for the agent's purpose, scope, and behavior."
+        },
+        "domain": {
+          "type": "string",
+          "description": "The business or technical domain within which this agent operates. Domain classification supports scoping, access control, and organizational alignment."
+        },
+        "costCenter": {
+          "type": "string",
+          "description": "The organizational unit responsible for costs incurred by this agent. Cost attribution ensures that resource consumption is accountable."
+        },
+        "escalationContact": {
+          "type": "string",
+          "description": "The contact or role to notify when issues arise with this agent. Escalation contacts enable rapid response to failures, policy violations, or security incidents."
+        }
+      }
+    },
+
+    "purpose": {
+      "type": "object",
+      "description": "The declared purpose of this agent. Purpose establishes why the agent exists and what it is intended to accomplish. Actions outside the declared purpose warrant scrutiny.",
+      "required": ["statement", "role"],
+      "properties": {
+        "statement": {
+          "type": "string",
+          "description": "A clear description of what this agent exists to accomplish. Purpose statements inform reviewers, operators, and auditors about the agent's intended function."
+        },
+        "role": {
+          "type": "string",
+          "description": "The role this agent fulfills within the enterprise. Roles are organizational constructs that define responsibility boundaries and expected behavior patterns."
+        },
+        "constraints": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicit constraints on how this agent may pursue its purpose. Constraints narrow the agent's latitude and clarify what methods or approaches are not permitted."
+        }
+      }
+    },
+
+    "authorityScope": {
+      "type": "object",
+      "description": "The boundaries within which this agent is authorized to act. Authority scope defines what the agent may do, where it may act, and what resources it may access. Actions outside this scope are unauthorized.",
+      "required": ["allowedActions", "resourceBoundaries"],
+      "properties": {
+        "allowedActions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "The actions this agent is authorized to perform. Actions not listed are not permitted. This enumeration supports least-privilege design."
+        },
+        "resourceBoundaries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "The resources, systems, or data domains this agent may access. Boundaries prevent agents from affecting systems outside their intended scope."
+        },
+        "toolGrants": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "References to tool contracts this agent is permitted to invoke. Tool grants connect agent identity to the tool governance layer."
+        },
+        "delegationAuthority": {
+          "type": "object",
+          "description": "Whether and how this agent may delegate work to other agents. Delegation authority controls the propagation of responsibility in multi-agent systems.",
+          "properties": {
+            "mayDelegate": {
+              "type": "boolean",
+              "description": "Whether this agent is permitted to delegate tasks to other agents."
+            },
+            "delegationScope": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "The types of tasks or actions this agent may delegate. Delegation scope limits what responsibilities can be transferred."
+            }
+          }
+        }
+      }
+    },
+
+    "trustClassification": {
+      "type": "object",
+      "description": "The trust level and risk posture assigned to this agent. Trust classification informs what controls, oversight, and approval requirements apply. Higher trust levels may grant broader autonomy; lower levels require tighter constraints.",
+      "required": ["level"],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["untrusted", "limited", "standard", "elevated", "privileged"],
+          "description": "The assessed trust level of this agent. Trust level determines what the agent may do without additional oversight and what actions require approval gates."
+        },
+        "riskFactors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Factors that contribute to this agent's risk profile. Risk factors explain why the agent is classified at its current trust level and inform ongoing review."
+        },
+        "reviewCadence": {
+          "type": "string",
+          "description": "How frequently this agent's trust classification should be reviewed. Regular review ensures that trust levels remain appropriate as the agent's behavior and context evolve."
+        },
+        "restrictions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Specific restrictions that apply to this agent based on its trust classification. Restrictions are additional constraints beyond the authority scope."
+        }
+      }
+    },
+
+    "lifecycleState": {
+      "type": "object",
+      "description": "The current state of this agent in its lifecycle. Lifecycle state determines whether the agent may operate, and under what conditions. State transitions are significant events that should be recorded.",
+      "required": ["state"],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["pending", "active", "suspended", "deprecated", "retired"],
+          "description": "The current lifecycle state of this agent. Pending agents are not yet authorized to operate. Active agents may operate within their scope. Suspended agents are temporarily prevented from operating. Deprecated agents are scheduled for retirement. Retired agents no longer exist as operational entities."
+        },
+        "stateReason": {
+          "type": "string",
+          "description": "The reason for the current lifecycle state. State reasons provide context for why an agent is in its current state, supporting audit and operational clarity."
+        },
+        "effectiveDate": {
+          "type": "string",
+          "description": "When the current lifecycle state became effective. Effective dates support temporal reasoning about agent behavior and audit."
+        },
+        "expirationDate": {
+          "type": "string",
+          "description": "When this agent identity expires, if applicable. Expiration dates enforce time-bounded authorization and require explicit renewal for continued operation."
+        },
+        "lastReviewDate": {
+          "type": "string",
+          "description": "When this agent identity was last reviewed. Review dates demonstrate ongoing governance and support compliance requirements."
+        }
+      }
+    },
+
+    "auditBinding": {
+      "type": "object",
+      "description": "How this agent's actions are connected to audit records. Audit binding ensures that actions taken by this agent can be traced back to this identity.",
+      "properties": {
+        "auditIdentifier": {
+          "type": "string",
+          "description": "The identifier used to tag audit records produced by this agent. The audit identifier links operational logs to this identity record."
+        },
+        "retentionRequirements": {
+          "type": "string",
+          "description": "How long audit records for this agent must be retained. Retention requirements may derive from regulatory, legal, or organizational policy."
+        }
+      }
+    },
+
+    "metadata": {
+      "type": "object",
+      "description": "Additional information about this identity record that supports governance and operations.",
+      "properties": {
+        "createdDate": {
+          "type": "string",
+          "description": "When this identity record was created."
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "Who or what created this identity record."
+        },
+        "lastModifiedDate": {
+          "type": "string",
+          "description": "When this identity record was last modified."
+        },
+        "lastModifiedBy": {
+          "type": "string",
+          "description": "Who or what last modified this identity record."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Free-form notes about this agent identity. Notes provide context that may not fit into structured fields."
+        }
+      }
+    }
+  }
+}

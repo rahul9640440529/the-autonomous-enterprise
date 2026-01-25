@@ -1,0 +1,270 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://autonomous-enterprise/schemas/tool-contract.schema.json",
+  "title": "Tool Contract",
+  "description": "Defines a tool as a governed action surface within an enterprise autonomous agent system. This schema supports Chapter 3 of 'The Autonomous Enterprise'. A tool contract declares what an agent may invoke, under what constraints, and with what consequences. It is not an API definition; it is a governance artifact that enables architecture review, security assessment, and compliance discussion.",
+
+  "type": "object",
+  "required": [
+    "contractVersion",
+    "toolIdentity",
+    "scope",
+    "inputs",
+    "outputs",
+    "sideEffects",
+    "riskClassification"
+  ],
+
+  "properties": {
+
+    "contractVersion": {
+      "type": "string",
+      "description": "The version of this tool contract. Versioning enables tracking of changes to tool capabilities, constraints, and risk classifications over time. Contract versions are distinct from implementation versions."
+    },
+
+    "toolIdentity": {
+      "type": "object",
+      "description": "Identifies the tool and establishes its purpose within the enterprise. Identity enables traceability from agent actions back to authorized capabilities.",
+      "required": ["name", "purpose", "owner"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A unique, stable identifier for the tool. This name is referenced in audit records, policy definitions, and agent configurations."
+        },
+        "purpose": {
+          "type": "string",
+          "description": "A clear statement of what this tool exists to accomplish. Purpose establishes the intended use case and helps reviewers assess whether invocations are appropriate."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The organizational entity accountable for this tool's definition, maintenance, and governance. Ownership establishes who is responsible when questions arise about tool behavior or policy."
+        },
+        "domain": {
+          "type": "string",
+          "description": "The business or technical domain within which this tool operates. Domain classification supports scoping, access control, and organizational alignment."
+        }
+      }
+    },
+
+    "scope": {
+      "type": "object",
+      "description": "Defines the boundaries within which this tool may operate. Scope constraints limit what the tool can affect and under what conditions it may be invoked.",
+      "required": ["allowedActions"],
+      "properties": {
+        "allowedActions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "An enumeration of the specific actions this tool may perform. Actions are named capabilities, not implementation endpoints. Only actions listed here are permitted."
+        },
+        "resourceBoundaries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Constraints on which resources this tool may access or modify. Resource boundaries prevent tools from affecting systems, data, or entities outside their intended scope."
+        },
+        "temporalConstraints": {
+          "type": "object",
+          "description": "Time-based restrictions on tool availability or invocation. Temporal constraints may reflect business hours, maintenance windows, or regulatory requirements.",
+          "properties": {
+            "availabilityWindow": {
+              "type": "string",
+              "description": "A description of when this tool may be invoked. Invocations outside the availability window are prohibited."
+            },
+            "maximumDuration": {
+              "type": "string",
+              "description": "The maximum time a single invocation may run before it must be terminated or escalated."
+            }
+          }
+        }
+      }
+    },
+
+    "inputs": {
+      "type": "object",
+      "description": "Declares the information required to invoke this tool. Input declarations enable validation before execution and support audit trails that capture what data informed the action.",
+      "required": ["parameters"],
+      "properties": {
+        "parameters": {
+          "type": "array",
+          "description": "The set of named inputs this tool requires or accepts. Each parameter has a defined purpose and constraints.",
+          "items": {
+            "type": "object",
+            "required": ["name", "purpose", "required"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "The identifier for this input parameter."
+              },
+              "purpose": {
+                "type": "string",
+                "description": "An explanation of why this input is needed and how it influences tool behavior."
+              },
+              "required": {
+                "type": "boolean",
+                "description": "Whether this parameter must be provided for the tool to be invoked. Missing required parameters prevent execution."
+              },
+              "sensitivityClassification": {
+                "type": "string",
+                "description": "The sensitivity level of this input. Sensitivity classification informs handling, logging, and retention decisions."
+              },
+              "constraints": {
+                "type": "string",
+                "description": "A description of valid values, formats, or ranges for this parameter. Constraints are declarative, not implementation logic."
+              }
+            }
+          }
+        },
+        "contextRequirements": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Context that must be available for this tool to operate correctly. Context requirements declare dependencies on external state without specifying retrieval mechanisms."
+        }
+      }
+    },
+
+    "outputs": {
+      "type": "object",
+      "description": "Declares what this tool produces upon successful execution. Output declarations enable agents to reason about results and support audit trails that capture what the tool returned.",
+      "properties": {
+        "returnValue": {
+          "type": "object",
+          "description": "The primary output of a successful invocation.",
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "An explanation of what the return value represents and how it should be interpreted."
+            },
+            "sensitivityClassification": {
+              "type": "string",
+              "description": "The sensitivity level of the output. Sensitivity classification informs how results may be used, logged, or retained."
+            }
+          }
+        },
+        "possibleOutcomes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "An enumeration of the possible result states this tool may produce, including success, partial success, and defined failure modes."
+        }
+      }
+    },
+
+    "sideEffects": {
+      "type": "object",
+      "description": "Declares the consequences of invoking this tool beyond its return value. Side-effect declarations are essential for understanding risk, planning rollback, and assessing impact.",
+      "required": ["classification"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["read-only", "state-changing", "irreversible"],
+          "description": "The category of side effects this tool produces. Read-only tools do not modify state. State-changing tools modify state but changes may be reversed. Irreversible tools produce changes that cannot be undone."
+        },
+        "affectedSystems": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "An enumeration of systems, services, or data stores that may be modified by this tool. Affected system declarations support impact analysis and change management."
+        },
+        "reversibilityNotes": {
+          "type": "string",
+          "description": "A description of whether and how the effects of this tool can be undone. For state-changing tools, this explains the rollback path. For irreversible tools, this explains why reversal is not possible."
+        },
+        "propagationScope": {
+          "type": "string",
+          "description": "A description of how far the effects of this tool may propagate. Some tools affect only local state; others trigger downstream processes, notifications, or external integrations."
+        }
+      }
+    },
+
+    "riskClassification": {
+      "type": "object",
+      "description": "Declares the risk level associated with this tool and the approval requirements that apply. Risk classification connects tool invocation to governance policy.",
+      "required": ["level"],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"],
+          "description": "The assessed risk level of this tool. Risk level determines what controls, approvals, and oversight apply to invocations."
+        },
+        "riskFactors": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "The specific factors that contribute to this tool's risk classification. Risk factors explain why the tool is classified at its current level."
+        },
+        "approvalRequirements": {
+          "type": "object",
+          "description": "The approval gates that must be satisfied before this tool may be invoked. Approval requirements translate risk classification into actionable governance.",
+          "properties": {
+            "requiresHumanApproval": {
+              "type": "boolean",
+              "description": "Whether a human must explicitly approve invocations of this tool before execution proceeds."
+            },
+            "approverRole": {
+              "type": "string",
+              "description": "The organizational role authorized to approve invocations when human approval is required."
+            },
+            "approvalTimeout": {
+              "type": "string",
+              "description": "The maximum time an invocation may wait for approval before the request expires."
+            },
+            "escalationPath": {
+              "type": "string",
+              "description": "The process for escalating approval requests that are not resolved within the expected timeframe."
+            }
+          }
+        }
+      }
+    },
+
+    "preconditions": {
+      "type": "array",
+      "description": "Conditions that must be true before this tool may be invoked. Preconditions are declarative constraints, not executable validation logic. They describe the required state of the world, not how to verify it.",
+      "items": {
+        "type": "object",
+        "required": ["condition", "rationale"],
+        "properties": {
+          "condition": {
+            "type": "string",
+            "description": "A description of a condition that must hold for invocation to proceed."
+          },
+          "rationale": {
+            "type": "string",
+            "description": "An explanation of why this condition is required. Rationale supports review and helps operators understand the constraint."
+          }
+        }
+      }
+    },
+
+    "postconditions": {
+      "type": "array",
+      "description": "Conditions that should be true after successful execution of this tool. Postconditions describe expected outcomes and support verification that the tool achieved its purpose.",
+      "items": {
+        "type": "object",
+        "required": ["condition", "verificationApproach"],
+        "properties": {
+          "condition": {
+            "type": "string",
+            "description": "A description of a condition that should hold after successful invocation."
+          },
+          "verificationApproach": {
+            "type": "string",
+            "description": "A description of how this postcondition can be verified. Verification approaches are conceptual, not implementation-specific."
+          }
+        }
+      }
+    },
+
+    "auditRequirements": {
+      "type": "object",
+      "description": "Declares what must be recorded when this tool is invoked. Audit requirements ensure that tool usage is traceable and that records support accountability, compliance, and incident investigation.",
+      "properties": {
+        "mustLog": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "An enumeration of elements that must be captured in audit records for every invocation of this tool."
+        },
+        "retentionRequirements": {
+          "type": "string",
+          "description": "A description of how long audit records for this tool must be retained. Retention requirements may derive from regulatory, legal, or organizational policy."
+        }
+      }
+    }
+  }
+}

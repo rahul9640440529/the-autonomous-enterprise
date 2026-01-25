@@ -1,0 +1,288 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://autonomous-enterprise/schemas/audit-event.schema.json",
+  "title": "Audit Event",
+  "description": "Defines a structured audit event emitted by an autonomous agent system. This schema supports Chapter 6 of 'The Autonomous Enterprise'. Audit events are first-class evidence for explainability, accountability, and post-incident reconstruction. They are not application logs; they are governance artifacts that capture what happened, who acted, and why. This schema is implementation-agnostic and does not assume any specific logging infrastructure.",
+
+  "type": "object",
+  "required": [
+    "eventIdentity",
+    "timestamp",
+    "actor",
+    "eventType",
+    "correlation",
+    "outcome"
+  ],
+
+  "properties": {
+
+    "eventIdentity": {
+      "type": "object",
+      "description": "A stable, unique identifier for this audit event. Event identity enables precise reference to specific events in investigations, compliance reporting, and cross-system correlation.",
+      "required": ["eventId"],
+      "properties": {
+        "eventId": {
+          "type": "string",
+          "description": "A globally unique, immutable identifier for this event. This identifier does not change and can be used to reference this specific event indefinitely."
+        },
+        "eventVersion": {
+          "type": "string",
+          "description": "The version of this event record, if the event has been amended or enriched after initial creation. Versioning supports event correction while preserving the original record."
+        }
+      }
+    },
+
+    "timestamp": {
+      "type": "object",
+      "description": "When this event occurred. Timestamps are essential for sequencing events, establishing causality, and correlating with external system records.",
+      "required": ["occurredAt"],
+      "properties": {
+        "occurredAt": {
+          "type": "string",
+          "description": "The time at which the event occurred, in a standard format. This is the authoritative timestamp for the event."
+        },
+        "recordedAt": {
+          "type": "string",
+          "description": "The time at which the event was recorded in the audit system, if different from when it occurred. Recording delays may occur in distributed systems."
+        },
+        "timezone": {
+          "type": "string",
+          "description": "The timezone context for the timestamps, if not embedded in the timestamp format. Timezone clarity prevents misinterpretation during cross-region investigations."
+        }
+      }
+    },
+
+    "actor": {
+      "type": "object",
+      "description": "The entity that performed or initiated the action recorded in this event. Actor information establishes accountability and enables tracing actions back to responsible parties.",
+      "required": ["agentIdentityRef"],
+      "properties": {
+        "agentIdentityRef": {
+          "type": "string",
+          "description": "A reference to the agent identity record of the agent that performed this action. This connects the audit event to the agent's declared purpose, scope, and ownership."
+        },
+        "agentName": {
+          "type": "string",
+          "description": "The human-readable name of the agent at the time of the event. Names may change over time; the identity reference is authoritative."
+        },
+        "humanApproverRef": {
+          "type": "string",
+          "description": "A reference to the human who approved this action, if human approval was required. This field connects autonomous actions to human oversight decisions."
+        },
+        "humanApproverIdentity": {
+          "type": "string",
+          "description": "The identity of the human approver in a human-readable form. This supports audit readability without requiring identity resolution."
+        },
+        "onBehalfOf": {
+          "type": "string",
+          "description": "The end user or system on whose behalf the agent was acting, if applicable. This establishes the chain of delegation from original requestor to agent action."
+        }
+      }
+    },
+
+    "eventType": {
+      "type": "object",
+      "description": "The category and specific type of event being recorded. Event types enable filtering, analysis, and policy-based handling of audit records.",
+      "required": ["category"],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "decision-proposed",
+            "tool-invoked",
+            "action-executed",
+            "action-blocked",
+            "escalation-requested",
+            "escalation-approved",
+            "escalation-denied",
+            "error-occurred",
+            "state-changed"
+          ],
+          "description": "The primary category of this event. Categories distinguish between different phases of agent operation: reasoning, execution, escalation, and error handling."
+        },
+        "subtype": {
+          "type": "string",
+          "description": "A more specific classification within the category. Subtypes enable finer-grained analysis without proliferating top-level categories."
+        },
+        "description": {
+          "type": "string",
+          "description": "A human-readable description of what this event represents. Descriptions support audit readability and reduce the need for category lookup during review."
+        }
+      }
+    },
+
+    "correlation": {
+      "type": "object",
+      "description": "Identifiers that connect this event to related events, enabling reconstruction of complete interaction sequences and causal chains.",
+      "required": ["traceId"],
+      "properties": {
+        "traceId": {
+          "type": "string",
+          "description": "An identifier that groups all events belonging to the same end-to-end operation or task. Trace IDs enable reconstruction of complete agent workflows."
+        },
+        "requestId": {
+          "type": "string",
+          "description": "An identifier for the specific request or trigger that initiated this event. Request IDs connect events to their originating inputs."
+        },
+        "parentEventId": {
+          "type": "string",
+          "description": "The event ID of the event that directly caused or preceded this event. Parent references enable reconstruction of causal chains within a trace."
+        },
+        "sessionId": {
+          "type": "string",
+          "description": "An identifier for the session or conversation context within which this event occurred, if applicable."
+        }
+      }
+    },
+
+    "actionContext": {
+      "type": "object",
+      "description": "Details about the action that was proposed, attempted, or executed. Action context provides the specifics needed to understand what the agent did or tried to do.",
+      "properties": {
+        "toolContractRef": {
+          "type": "string",
+          "description": "A reference to the tool contract that governs the tool invoked in this event. This connects the action to its declared capabilities, constraints, and risk classification."
+        },
+        "toolName": {
+          "type": "string",
+          "description": "The name of the tool invoked, for readability. The contract reference is authoritative."
+        },
+        "actionName": {
+          "type": "string",
+          "description": "The specific action within the tool that was invoked. Actions are the unit of capability within a tool contract."
+        },
+        "actionScope": {
+          "type": "object",
+          "description": "The scope within which the action was executed, including any resource boundaries or constraints that applied.",
+          "properties": {
+            "resourcesAffected": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "The resources that were read, modified, or otherwise affected by this action."
+            },
+            "scopeConstraints": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "The constraints that bounded this action's scope, derived from agent identity, tool contract, or policy."
+            }
+          }
+        },
+        "inputSummary": {
+          "type": "string",
+          "description": "A summary of the inputs provided to the action. This is a summary for audit purposes, not a complete record of potentially sensitive input data."
+        },
+        "sideEffectClassification": {
+          "type": "string",
+          "enum": ["read-only", "state-changing", "irreversible"],
+          "description": "The side-effect classification of the action, as declared in the tool contract. This enables risk-based filtering of audit events."
+        }
+      }
+    },
+
+    "outcome": {
+      "type": "object",
+      "description": "The result of the action or decision recorded in this event. Outcome information enables analysis of success rates, failure patterns, and intervention frequency.",
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["success", "failure", "blocked", "pending", "timeout", "escalated"],
+          "description": "The final status of the action or decision. Status indicates whether the intended outcome was achieved."
+        },
+        "statusReason": {
+          "type": "string",
+          "description": "An explanation of why the action resulted in this status. Reasons are essential for understanding failures, blocks, and escalations."
+        },
+        "errorCode": {
+          "type": "string",
+          "description": "A machine-readable error code, if the action failed. Error codes enable automated analysis and categorization of failures."
+        },
+        "resultSummary": {
+          "type": "string",
+          "description": "A summary of the result produced by a successful action. This is a summary for audit purposes, not a complete record of potentially sensitive output data."
+        }
+      }
+    },
+
+    "evidenceReferences": {
+      "type": "object",
+      "description": "References to supporting evidence that explains or justifies this event. Evidence references are pointers, not embedded data, to keep audit events focused and to manage sensitive information appropriately.",
+      "properties": {
+        "reasoningTraceRef": {
+          "type": "string",
+          "description": "A reference to the reasoning trace that explains the decision or action recorded in this event. The trace provides detailed explainability; this event provides the summary."
+        },
+        "contextSnapshotRef": {
+          "type": "string",
+          "description": "A reference to a snapshot of the context the agent had at the time of this event. Context snapshots enable reconstruction of what the agent knew when it acted."
+        },
+        "approvalPacketRef": {
+          "type": "string",
+          "description": "A reference to the approval packet that authorized this action, if human approval was required. Approval packets contain the justification and approver decision."
+        },
+        "relatedArtifacts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "References to other artifacts relevant to understanding this event, such as prior decisions, related actions, or external records."
+        }
+      }
+    },
+
+    "policyContext": {
+      "type": "object",
+      "description": "References to the policies that governed this event. Policy context establishes what rules applied and enables verification that actions complied with organizational requirements.",
+      "properties": {
+        "appliedPolicies": {
+          "type": "array",
+          "description": "References to the policies that were evaluated or enforced during this event.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "policyRef": {
+                "type": "string",
+                "description": "A reference to the policy definition."
+              },
+              "policyVersion": {
+                "type": "string",
+                "description": "The version of the policy that was applied. Version references ensure that auditors can identify exactly which rules were in effect."
+              },
+              "evaluationResult": {
+                "type": "string",
+                "enum": ["allowed", "denied", "not-applicable"],
+                "description": "The result of evaluating this policy against the action."
+              }
+            }
+          }
+        },
+        "guardrailsApplied": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "References to guardrails that were evaluated during this event. Guardrail references document what constraint checks occurred."
+        }
+      }
+    },
+
+    "metadata": {
+      "type": "object",
+      "description": "Additional information about this audit event that supports governance and operations.",
+      "properties": {
+        "sourceSystem": {
+          "type": "string",
+          "description": "The system or component that generated this audit event. Source identification supports debugging and system-level analysis."
+        },
+        "environmentContext": {
+          "type": "string",
+          "description": "The environment in which this event occurred, such as production, staging, or development. Environment context prevents confusion during cross-environment investigations."
+        },
+        "retentionClassification": {
+          "type": "string",
+          "description": "The retention classification for this event, which determines how long the event must be preserved. Retention may be driven by regulatory, legal, or organizational requirements."
+        },
+        "sensitivityLevel": {
+          "type": "string",
+          "description": "The sensitivity level of this event, which determines access controls and handling requirements. Sensitive events may require restricted access."
+        }
+      }
+    }
+  }
+}
